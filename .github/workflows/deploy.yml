@@ -1,8 +1,44 @@
-- name: Clean Maven
-  run: mvn clean
+name: Java CI and Deploy to Render
 
-- name: Build with Maven
-  run: mvn clean package -DskipTests
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
 
-- name: Run tests
-  run: mvn clean test
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout du code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Configuration de Java 17
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      # Step 3: Build avec Maven (sans tests pour gagner du temps)
+      - name: Build with Maven
+        run: mvn clean package -DskipTests
+
+      # Step 4: Exécuter les tests avec H2
+      - name: Run tests with H2
+        run: mvn test
+
+      # Step 5: Build de l'image Docker
+      - name: Build Docker image
+        run: docker build -t student-service .
+
+      # ******* Déploiement Continu *******
+      # Step 6: Déployer sur Render
+      - name: Deploy to Render
+        uses: johnbeynon/render-deploy-action@v0.0.8
+        with:
+          service-id: ${{ secrets.SERVICE_ID }}
+          api-key: ${{ secrets.RENDER_API_KEY }}

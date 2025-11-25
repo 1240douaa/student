@@ -10,8 +10,6 @@ FROM eclipse-temurin:17-jre
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
-# Expose port
 EXPOSE 8080
 
-# Run with production profile
 CMD ["java", "-jar", "-Dspring.profiles.active=prod", "app.jar"]

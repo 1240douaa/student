@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/students")
-@CrossOrigin(origins = "*") // Pour éviter les problèmes CORS si nécessaire
+@RequestMapping("/api/students")  // ✅ AJOUT DE /api
+@CrossOrigin(origins = "*")
 public class StudentController {
 
     private final StudentRepository studentRepository;
@@ -21,7 +21,7 @@ public class StudentController {
     }
 
     /**
-     * GET /students - Récupère tous les étudiants
+     * GET /api/students - Récupère tous les étudiants
      */
     @GetMapping
     public ResponseEntity<List<Student>> getAll() {
@@ -30,21 +30,14 @@ public class StudentController {
     }
 
     /**
-     * POST /students - Crée un nouvel étudiant
+     * POST /api/students - Crée un nouvel étudiant
      */
     @PostMapping
     public ResponseEntity<Student> create(@RequestBody Student student) {
         try {
-            // S'assurer que l'ID est null pour une nouvelle création
             student.setId(null);
-            
-            // Sauvegarder l'étudiant
             Student savedStudent = studentRepository.save(student);
-            
-            // Log pour débogage
             System.out.println("✅ Étudiant créé : " + savedStudent);
-            
-            // Retourner 201 CREATED avec le corps de la réponse
             return ResponseEntity.status(HttpStatus.CREATED).body(savedStudent);
         } catch (Exception e) {
             System.err.println("❌ Erreur lors de la création : " + e.getMessage());
@@ -54,17 +47,24 @@ public class StudentController {
     }
 
     /**
-     * GET /students/{id} - Récupère un étudiant par son ID
+     * GET /api/students/{id} - Récupère un étudiant par son ID
      */
     @GetMapping("/{id}")
     public ResponseEntity<Student> getById(@PathVariable Long id) {
+        System.out.println("🔍 Recherche de l'étudiant avec ID: " + id);  // Debug
         return studentRepository.findById(id)
-                .map(student -> ResponseEntity.ok(student))
-                .orElse(ResponseEntity.notFound().build());
+                .map(student -> {
+                    System.out.println("✅ Étudiant trouvé : " + student);
+                    return ResponseEntity.ok(student);
+                })
+                .orElseGet(() -> {
+                    System.out.println("❌ Étudiant non trouvé avec ID: " + id);
+                    return ResponseEntity.notFound().build();
+                });
     }
 
     /**
-     * PUT /students/{id} - Met à jour un étudiant existant
+     * PUT /api/students/{id} - Met à jour un étudiant existant
      */
     @PutMapping("/{id}")
     public ResponseEntity<Student> update(@PathVariable Long id, @RequestBody Student student) {
@@ -81,7 +81,7 @@ public class StudentController {
     }
 
     /**
-     * DELETE /students/{id} - Supprime un étudiant
+     * DELETE /api/students/{id} - Supprime un étudiant
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
@@ -93,7 +93,7 @@ public class StudentController {
     }
 
     /**
-     * GET /students/search?name=xxx - Recherche par nom
+     * GET /api/students/search?name=xxx - Recherche par nom
      */
     @GetMapping("/search")
     public ResponseEntity<List<Student>> searchByName(@RequestParam String name) {
@@ -102,7 +102,7 @@ public class StudentController {
     }
 
     /**
-     * GET /students/university/{universityId} - Récupère les étudiants d'une université
+     * GET /api/students/university/{universityId} - Récupère les étudiants d'une université
      */
     @GetMapping("/university/{universityId}")
     public ResponseEntity<List<Student>> getByUniversityId(@PathVariable Long universityId) {

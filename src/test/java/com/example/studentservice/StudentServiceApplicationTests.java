@@ -8,7 +8,7 @@ class StudentServiceApplicationTests {
 
 	@Test
 	void contextLoads() {
-		// Ce test vérifie juste que le contexte Spring se charge correctement
+		// Test que le contexte Spring se charge correctement
 	}
 
 }

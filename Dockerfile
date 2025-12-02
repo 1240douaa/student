@@ -10,6 +10,6 @@ FROM eclipse-temurin:17-jre
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
-EXPOSE 8080
+EXPOSE 8081
 
-CMD ["java", "-jar", "-Dspring.profiles.active=prod", "app.jar"]
+CMD ["java", "-jar", "-Dspring.profiles.active=prod", "-Dserver.port=8081", "app.jar"]

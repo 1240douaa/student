@@ -1,11 +1,17 @@
+name: Clean Maven
+  run: mvn clean
 name: Java CI and Deploy to Render
 
+- name: Build with Maven
+  run: mvn clean package -DskipTests
 on:
   push:
     branches: [ master, main ]
   pull_request:
     branches: [ master, main ]
 
+- name: Run tests
+  run: mvn clean test
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
